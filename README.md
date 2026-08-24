@@ -27,7 +27,18 @@ CLI smoke test:
 npm run simulate --workspace=server
 ```
 
-## Architecture
+## Simulation graph (custom scenarios)
+
+Define any scenario description, custom tools (name, action, possible returns), and policies. Click **Run simulation** to generate a **branching graph** (default: up to 15 nodes, 3 branches per node, depth 4).
+
+- Each tool **return value** can spawn a branch
+- **Policy DENY/DEFER** creates alternate branches
+- **Horizon-style timeline** for any selected path
+- **Path picker** to explore different outcomes
+
+API: `POST /api/simulate/graph` with `{ scenario, policies, limits }`
+
+Examples: `GET /api/examples` (prior auth, document collection)
 
 ```
 Task definition + policies + persona

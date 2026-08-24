@@ -2,7 +2,10 @@ import cors from "cors";
 import express from "express";
 import {
   runSimulation,
+  runGraphSimulation,
   TASK_TEMPLATES,
+  EXAMPLE_SCENARIOS,
+  type GraphSimulationRequest,
   type PersonaId,
   type SimulationRequest,
 } from "@task-studio/core";
@@ -60,6 +63,32 @@ app.post("/api/simulate/template/:templateId", (req, res) => {
     console.error(error);
     res.status(500).json({
       error: error instanceof Error ? error.message : "Simulation failed",
+    });
+  }
+});
+
+app.get("/api/examples", (_req, res) => {
+  res.json(EXAMPLE_SCENARIOS);
+});
+
+app.post("/api/simulate/graph", (req, res) => {
+  try {
+    const body = req.body as GraphSimulationRequest;
+    if (!body.scenario || !body.policies) {
+      res.status(400).json({ error: "scenario and policies are required" });
+      return;
+    }
+    if (!body.scenario.tools?.length) {
+      res.status(400).json({ error: "scenario must include at least one tool" });
+      return;
+    }
+
+    const result = runGraphSimulation(body);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : "Graph simulation failed",
     });
   }
 });

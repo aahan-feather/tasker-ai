@@ -1,0 +1,248 @@
+.wrapper {
+  background: #f4f6f9;
+  border-radius: 12px;
+  padding: 1.5rem 1rem 1rem;
+  overflow: hidden;
+}
+
+.rail {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  padding: 0 0.5rem;
+  min-height: 36px;
+}
+
+.railSegment {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 140px;
+  position: relative;
+}
+
+.railDot {
+  width: 10px;
+  height: 10px;
+  background: #3b6fd9;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.railDotMuted {
+  width: 8px;
+  height: 8px;
+  background: #c5cdd8;
+  transform: rotate(45deg);
+}
+
+.railLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1a2332;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+}
+
+.railLabelMuted {
+  font-size: 0.75rem;
+  color: #8b95a8;
+  margin-left: 0.5rem;
+}
+
+.railLine {
+  flex: 1;
+  height: 2px;
+  background: #3b6fd9;
+  margin: 0 0.25rem;
+  min-width: 24px;
+}
+
+.columns {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.column {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.signalCard {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.signalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.signalTitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.signalBadge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.signalHeadline {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.35rem;
+  line-height: 1.35;
+}
+
+.signalDesc {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.memoryCard {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.memoryHeader {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sparkle {
+  color: #8b5cf6;
+}
+
+.memoryList {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.actionBlock {
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.actionMeta {
+  font-weight: 600;
+  font-size: 0.72rem;
+  margin-bottom: 0.25rem;
+  opacity: 0.85;
+}
+
+.actionDesc {
+  margin: 0;
+  line-height: 1.4;
+  color: #1e293b;
+}
+
+.actionReturn {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: #475569;
+  font-style: italic;
+}
+
+.policyNote {
+  margin: 0.35rem 0 0;
+  font-size: 0.7rem;
+  color: #b45309;
+}
+
+.catHorizon {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.catApi {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.catPhone {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.catWorkflow {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.catSms {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.catEmail {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.catTool {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.branchTag {
+  font-size: 0.68rem;
+  color: #64748b;
+  padding: 0.25rem 0.5rem;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px dashed #cbd5e1;
+}
+
+.pendingBlock {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  opacity: 0.5;
+}
+
+.pendingLine {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+
+.pendingLineShort {
+  height: 6px;
+  width: 60%;
+  background: #e2e8f0;
+  border-radius: 3px;
+}

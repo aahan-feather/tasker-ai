@@ -1,6 +1,9 @@
 import type {
+  CustomScenarioDefinition,
+  GraphSimulationRequest,
   PersonaId,
   PolicyDefinition,
+  SimulationGraph,
   SimulationResult,
   TaskDefinition,
   TaskTemplate,
@@ -11,6 +14,12 @@ const API_BASE = "/api";
 export async function fetchTemplates(): Promise<TaskTemplate[]> {
   const res = await fetch(`${API_BASE}/templates`);
   if (!res.ok) throw new Error("Failed to load templates");
+  return res.json();
+}
+
+export async function fetchExampleScenarios(): Promise<CustomScenarioDefinition[]> {
+  const res = await fetch(`${API_BASE}/examples`);
+  if (!res.ok) throw new Error("Failed to load examples");
   return res.json();
 }
 
@@ -27,6 +36,21 @@ export async function runSimulation(
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error ?? "Simulation failed");
+  }
+  return res.json();
+}
+
+export async function runGraphSimulation(
+  request: GraphSimulationRequest,
+): Promise<SimulationGraph> {
+  const res = await fetch(`${API_BASE}/simulate/graph`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error ?? "Graph simulation failed");
   }
   return res.json();
 }

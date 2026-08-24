@@ -121,3 +121,118 @@ export interface TaskTemplate {
   policies: PolicyDefinition[];
   defaultPersonaId: PersonaId;
 }
+
+// --- Custom scenario & simulation graph ---
+
+export type ToolCategory =
+  | "horizon"
+  | "api"
+  | "phone"
+  | "workflow"
+  | "sms"
+  | "email"
+  | "tool";
+
+export interface CustomToolDefinition {
+  id: string;
+  name: string;
+  category: ToolCategory;
+  description: string;
+  action: string;
+  returns: string[];
+}
+
+export interface CustomScenarioDefinition {
+  description: string;
+  outcome: string;
+  deadlineDays: number;
+  initialSignal?: string;
+  initialSignalBadge?: string;
+  tools: CustomToolDefinition[];
+}
+
+export interface GraphSimulationLimits {
+  maxDepth: number;
+  maxBranchesPerNode: number;
+  maxTotalNodes: number;
+}
+
+export const DEFAULT_GRAPH_LIMITS: GraphSimulationLimits = {
+  maxDepth: 4,
+  maxBranchesPerNode: 3,
+  maxTotalNodes: 15,
+};
+
+export interface GraphSimulationRequest {
+  scenario: CustomScenarioDefinition;
+  policies: PolicyDefinition[];
+  limits?: Partial<GraphSimulationLimits>;
+}
+
+export interface SignalCard {
+  title: string;
+  badge: string;
+  description: string;
+}
+
+export interface ActionBlock {
+  toolName: string;
+  category: ToolCategory;
+  subtitle: string;
+  description: string;
+  returnValue?: string;
+  policyVerdict?: PolicyVerdict;
+  policyReason?: string;
+  pending?: boolean;
+}
+
+export interface ScenarioState {
+  day: number;
+  stepIndex: number;
+  memory: string[];
+  phoneCallsToday: number;
+  phoneCallsWeek: number;
+  completed: boolean;
+  blocked: boolean;
+  escalated: boolean;
+  context: Record<string, string>;
+}
+
+export interface SimulationGraphNode {
+  id: string;
+  parentId?: string;
+  depth: number;
+  columnIndex: number;
+  timeLabel: string;
+  signal?: SignalCard;
+  agentMemory: string[];
+  actions: ActionBlock[];
+  childIds: string[];
+  branchLabel?: string;
+  stateSnapshot: ScenarioState;
+  isTerminal: boolean;
+}
+
+export type GraphPathOutcome = "success" | "partial" | "blocked" | "ongoing";
+
+export interface SimulationGraphPath {
+  id: string;
+  nodeIds: string[];
+  label: string;
+  outcome: GraphPathOutcome;
+}
+
+export interface SimulationGraph {
+  id: string;
+  scenario: CustomScenarioDefinition;
+  policies: PolicyDefinition[];
+  limits: GraphSimulationLimits;
+  nodes: SimulationGraphNode[];
+  rootId: string;
+  paths: SimulationGraphPath[];
+  nodeCount: number;
+  pathCount: number;
+  summary: string;
+  startedAt: string;
+  durationMs: number;
+}
