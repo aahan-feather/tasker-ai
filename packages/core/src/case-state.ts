@@ -27,6 +27,9 @@ export function allDocumentsReceived(
   state: CaseState,
   required: RequiredDocument[],
 ): boolean {
+  if (required.length === 0) {
+    return false;
+  }
   return required.every((doc) => state.documentsReceived.includes(doc.id));
 }
 

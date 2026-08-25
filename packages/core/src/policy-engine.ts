@@ -110,7 +110,11 @@ function evaluateGoalGate(
     return null;
   }
   if (policy.when === "all_documents_received" && policy.action === "suppress_all_outreach") {
-    if (allDocumentsReceived(state, task.requiredDocuments) && action.actionType === "outreach") {
+    const goalMet =
+      state.completed ||
+      (task.requiredDocuments.length > 0 &&
+        allDocumentsReceived(state, task.requiredDocuments));
+    if (goalMet && action.actionType === "outreach") {
       return {
         verdict: "DENY",
         reason: "Goal complete — outreach suppressed",

@@ -61,12 +61,13 @@ export function evaluateToolPolicies(
   const channel = categoryToChannel(proposal.category);
 
   if (channel) {
+    const goalId = "__scenario_goal__";
     const pseudoTask = {
       id: "custom",
       name: scenario.outcome,
       outcome: scenario.outcome,
       deadlineDays: scenario.deadlineDays,
-      requiredDocuments: [],
+      requiredDocuments: [{ id: goalId, label: scenario.outcome }],
       toolkit: [channel],
     };
 
@@ -76,21 +77,24 @@ export function evaluateToolPolicies(
       reason: proposal.reason,
     };
 
+    const channelTouches =
+      proposal.category === "phone" && state.phoneCallsToday > 0
+        ? Array.from({ length: state.phoneCallsToday }, () => ({
+            day: state.day,
+            hour: 10,
+            channel: "voice" as const,
+            actionType: "outreach",
+            outcome: "sim",
+            policyVerdict: "ALLOW" as const,
+          }))
+        : [];
+
     return evaluatePolicies(
       {
         day: state.day,
         simHour: 10,
-        documentsReceived: state.completed ? ["done"] : [],
-        touches: state.phoneCallsToday > 0
-          ? Array.from({ length: state.phoneCallsToday }, () => ({
-              day: state.day,
-              hour: 10,
-              channel: "voice" as const,
-              actionType: "outreach",
-              outcome: "sim",
-              policyVerdict: "ALLOW" as const,
-            }))
-          : [],
+        documentsReceived: state.completed ? [goalId] : [],
+        touches: channelTouches,
         optedOut: false,
         smsConsent: true,
         emailConsent: true,

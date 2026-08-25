@@ -168,7 +168,7 @@ export function runGraphSimulation(request: GraphSimulationRequest): SimulationG
     if (evaluation.verdict === "DENY") {
       branches = [
         {
-          label: "Policy blocked",
+          label: `Policy blocked: ${evaluation.reason}`,
           verdict: "DENY",
           reason: evaluation.reason,
           newState: applyPolicyDeny(item.state),
