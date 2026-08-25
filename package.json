@@ -1,0 +1,16 @@
+{
+  "name": "task-studio",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=server & npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "build": "npm run build --workspace=@task-studio/core && npm run build --workspace=server && npm run build --workspace=client",
+    "simulate": "npm run simulate --workspace=server"
+  }
+}

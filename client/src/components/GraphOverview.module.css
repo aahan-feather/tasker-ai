@@ -1,0 +1,112 @@
+.wrapper {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.pathList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 0.75rem;
+}
+
+.pathBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.pathBtn:hover {
+  border-color: var(--accent);
+}
+
+.pathBtnActive {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.outcomeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.outcomeSuccess {
+  background: var(--success);
+}
+
+.outcomePartial {
+  background: var(--warning);
+}
+
+.outcomeBlocked {
+  background: var(--danger);
+}
+
+.outcomeOngoing {
+  background: var(--text-muted);
+}
+
+.pathLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pathMeta {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.miniGraph {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.miniPath {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.miniNode {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniNodeActive {
+  border-color: var(--accent);
+  color: var(--accent);
+}
