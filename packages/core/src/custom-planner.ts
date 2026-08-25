@@ -119,6 +119,15 @@ export function planNextTool(
     return null;
   }
 
+  if (state.day > scenario.deadlineDays) {
+    return null;
+  }
+
+  const maxSteps = scenario.tools.length * scenario.deadlineDays;
+  if (state.stepIndex >= maxSteps) {
+    return null;
+  }
+
   const tools = scenario.tools;
   if (tools.length === 0) {
     return null;

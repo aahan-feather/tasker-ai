@@ -27,7 +27,13 @@ export function GraphOverview({
         <span>{graph.nodeCount} nodes</span>
         <span>{graph.pathCount} paths</span>
         <span>
-          depth ≤ {graph.limits.maxDepth} · {graph.limits.maxBranchesPerNode} branches/node
+          {graph.limits.maxDepth != null && graph.limits.maxDepth > 0
+            ? `depth ≤ ${graph.limits.maxDepth}`
+            : "unlimited depth"}
+          {graph.limits.maxBranchesPerNode != null &&
+          graph.limits.maxBranchesPerNode > 0
+            ? ` · ${graph.limits.maxBranchesPerNode} branches/node`
+            : " · all branches"}
         </span>
       </div>
 

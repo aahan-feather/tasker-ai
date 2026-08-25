@@ -90,6 +90,27 @@ function enumeratePaths(
   return paths;
 }
 
+/** Browser-safe ceiling when the user leaves max nodes blank. */
+const SAFETY_MAX_NODES = 250;
+
+function cap(value: number | undefined): number | null {
+  if (value === undefined || value <= 0) return null;
+  return value;
+}
+
+function formatLimitsSummary(limits: GraphSimulationLimits): string {
+  const parts: string[] = [];
+  const depth = cap(limits.maxDepth);
+  const branches = cap(limits.maxBranchesPerNode);
+  const nodes = cap(limits.maxTotalNodes);
+  if (depth !== null) parts.push(`depth ${depth}`);
+  if (branches !== null) parts.push(`${branches} branches/node`);
+  const nodesLimit = cap(limits.maxTotalNodes);
+  if (nodesLimit !== null) parts.push(`max ${nodesLimit} nodes`);
+  else parts.push(`max ${SAFETY_MAX_NODES} nodes (safety cap)`);
+  return parts.length > 0 ? parts.join(", ") : "no graph limits";
+}
+
 export function runGraphSimulation(request: GraphSimulationRequest): SimulationGraph {
   const start = Date.now();
   nodeCounter = 0;
@@ -98,6 +119,10 @@ export function runGraphSimulation(request: GraphSimulationRequest): SimulationG
     ...DEFAULT_GRAPH_LIMITS,
     ...request.limits,
   };
+
+  const maxDepth = cap(limits.maxDepth);
+  const maxBranchesPerNode = cap(limits.maxBranchesPerNode);
+  const maxTotalNodes = cap(limits.maxTotalNodes) ?? SAFETY_MAX_NODES;
 
   const nodes: SimulationGraphNode[] = [];
   const rootState = createScenarioState();
@@ -125,12 +150,12 @@ export function runGraphSimulation(request: GraphSimulationRequest): SimulationG
     { parentId: root.id, state: rootState, depth: 0 },
   ];
 
-  while (queue.length > 0 && nodes.length < limits.maxTotalNodes) {
+  while (queue.length > 0 && nodes.length < maxTotalNodes) {
     const item = queue.shift()!;
     const parent = nodes.find((n) => n.id === item.parentId);
     if (!parent) continue;
 
-    if (item.depth >= limits.maxDepth) {
+    if (maxDepth !== null && item.depth >= maxDepth) {
       parent.isTerminal = true;
       continue;
     }
@@ -187,18 +212,30 @@ export function runGraphSimulation(request: GraphSimulationRequest): SimulationG
       ];
     } else {
       const variants = tool.returns.length > 0 ? tool.returns : ["Completed successfully"];
-      branches = variants.slice(0, limits.maxBranchesPerNode).map((ret) => ({
+      const branchCap = maxBranchesPerNode ?? variants.length;
+      branches = variants.slice(0, branchCap).map((ret) => ({
         label: ret,
         returnValue: ret,
         verdict: "ALLOW" as const,
         reason: evaluation.reason,
-        newState: applyToolReturn(item.state, tool.name, tool.category, ret),
+        newState: applyToolReturn(
+          item.state,
+          tool.name,
+          tool.category,
+          ret,
+          request.scenario.outcome,
+        ),
         expandable: true,
       }));
     }
 
-    for (const branch of branches.slice(0, limits.maxBranchesPerNode)) {
-      if (nodes.length >= limits.maxTotalNodes) break;
+    const branchSlice =
+      maxBranchesPerNode === null
+        ? branches
+        : branches.slice(0, maxBranchesPerNode);
+
+    for (const branch of branchSlice) {
+      if (nodes.length >= maxTotalNodes) break;
 
       const childDepth = item.depth + 1;
       const childId = nextNodeId();
@@ -233,10 +270,10 @@ export function runGraphSimulation(request: GraphSimulationRequest): SimulationG
 
       const canExpand =
         branch.expandable &&
-        childDepth < limits.maxDepth &&
+        (maxDepth === null || childDepth < maxDepth) &&
         !branch.newState.completed &&
         !branch.newState.blocked &&
-        nodes.length < limits.maxTotalNodes;
+        nodes.length < maxTotalNodes;
 
       if (canExpand) {
         queue.push({ parentId: childId, state: branch.newState, depth: childDepth });
@@ -263,7 +300,7 @@ export function runGraphSimulation(request: GraphSimulationRequest): SimulationG
     paths,
     nodeCount: nodes.length,
     pathCount: paths.length,
-    summary: `Generated ${nodes.length} nodes across ${paths.length} paths (${successPaths} successful). Limits: depth ${limits.maxDepth}, ${limits.maxBranchesPerNode} branches/node, max ${limits.maxTotalNodes} nodes.`,
+    summary: `Generated ${nodes.length} nodes across ${paths.length} paths (${successPaths} successful). Limits: ${formatLimitsSummary(limits)}.`,
     startedAt: new Date(start).toISOString(),
     durationMs: Date.now() - start,
   };

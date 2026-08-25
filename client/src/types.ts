@@ -135,9 +135,9 @@ export interface CustomScenarioDefinition {
 }
 
 export interface GraphSimulationLimits {
-  maxDepth: number;
-  maxBranchesPerNode: number;
-  maxTotalNodes: number;
+  maxDepth?: number;
+  maxBranchesPerNode?: number;
+  maxTotalNodes?: number;
 }
 
 export interface GraphSimulationRequest {

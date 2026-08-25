@@ -26,11 +26,7 @@ import styles from "./App.module.css";
 
 type AppMode = "graph" | "template";
 
-const DEFAULT_LIMITS: GraphSimulationLimits = {
-  maxDepth: 4,
-  maxBranchesPerNode: 3,
-  maxTotalNodes: 15,
-};
+const DEFAULT_LIMITS: Partial<GraphSimulationLimits> = {};
 
 function cloneTask(task: TaskDefinition): TaskDefinition {
   return {
@@ -64,7 +60,7 @@ export default function App() {
   const [graph, setGraph] = useState<SimulationGraph | null>(null);
   const [selectedPathId, setSelectedPathId] = useState<string>("");
   const [scenario, setScenario] = useState<CustomScenarioDefinition>(EMPTY_SCENARIO);
-  const [limits, setLimits] = useState<GraphSimulationLimits>(DEFAULT_LIMITS);
+  const [limits, setLimits] = useState<Partial<GraphSimulationLimits>>(DEFAULT_LIMITS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -137,7 +133,11 @@ export default function App() {
         limits,
       });
       setGraph(g);
-      setSelectedPathId(g.paths[0]?.id ?? "");
+      const longestPath = g.paths.reduce(
+        (best, p) => (p.nodeIds.length > best.nodeIds.length ? p : best),
+        g.paths[0],
+      );
+      setSelectedPathId(longestPath?.id ?? "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Run failed");
     } finally {
@@ -252,9 +252,8 @@ export default function App() {
             {!graph && (
               <div className={styles.empty}>
                 Configure your scenario and tools, then click{" "}
-                <strong>Run simulation</strong> to generate up to{" "}
-                {limits.maxTotalNodes} nodes with {limits.maxBranchesPerNode} branches
-                per step.
+                <strong>Run simulation</strong> to explore all branches (no graph limits
+                by default).
               </div>
             )}
 
@@ -265,6 +264,10 @@ export default function App() {
                   selectedPathId={selectedPathId}
                   onSelectPath={setSelectedPathId}
                 />
+                <p className={styles.pathHint}>
+                  Timeline shows <strong>{selectedPath.nodeIds.length} steps</strong> on
+                  path “{selectedPath.label}”. Pick another path above to compare branches.
+                </p>
                 <HorizonTimeline
                   graph={graph}
                   pathNodeIds={selectedPath.nodeIds}

@@ -67,7 +67,6 @@ export function PolicyPanel({
                 <input
                   type="number"
                   min={0}
-                  max={30}
                   value={policy.max ?? 0}
                   onChange={(e) => onMaxChange(policy.id, Number(e.target.value))}
                 />

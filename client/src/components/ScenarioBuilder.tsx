@@ -18,10 +18,17 @@ const CATEGORIES: ToolCategory[] = [
 
 interface ScenarioBuilderProps {
   scenario: CustomScenarioDefinition;
-  limits: GraphSimulationLimits;
+  limits: Partial<GraphSimulationLimits>;
   examples: CustomScenarioDefinition[];
   onScenarioChange: (scenario: CustomScenarioDefinition) => void;
-  onLimitsChange: (limits: GraphSimulationLimits) => void;
+  onLimitsChange: (limits: Partial<GraphSimulationLimits>) => void;
+}
+
+function parseOptionalLimit(raw: string): number | undefined {
+  if (raw.trim() === "") return undefined;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return undefined;
+  return Math.floor(n);
 }
 
 function newTool(): CustomToolDefinition {
@@ -127,7 +134,6 @@ export function ScenarioBuilder({
           <input
             type="number"
             min={1}
-            max={30}
             value={scenario.deadlineDays}
             onChange={(e) =>
               onScenarioChange({
@@ -151,19 +157,23 @@ export function ScenarioBuilder({
       </label>
 
       <div className={styles.limits}>
-        <span className={styles.sectionTitle}>Graph limits</span>
+        <span className={styles.sectionTitle}>Graph limits (optional)</span>
+        <p className={styles.limitsHint}>
+          Leave blank for no limit. The graph expands across all tool return branches
+          until the scenario completes or branches end.
+        </p>
         <div className={styles.row}>
           <label className={styles.field}>
             Max depth
             <input
               type="number"
               min={1}
-              max={8}
-              value={limits.maxDepth}
+              placeholder="No limit"
+              value={limits.maxDepth ?? ""}
               onChange={(e) =>
                 onLimitsChange({
                   ...limits,
-                  maxDepth: Number(e.target.value),
+                  maxDepth: parseOptionalLimit(e.target.value),
                 })
               }
             />
@@ -173,12 +183,12 @@ export function ScenarioBuilder({
             <input
               type="number"
               min={1}
-              max={5}
-              value={limits.maxBranchesPerNode}
+              placeholder="No limit"
+              value={limits.maxBranchesPerNode ?? ""}
               onChange={(e) =>
                 onLimitsChange({
                   ...limits,
-                  maxBranchesPerNode: Number(e.target.value),
+                  maxBranchesPerNode: parseOptionalLimit(e.target.value),
                 })
               }
             />
@@ -187,13 +197,13 @@ export function ScenarioBuilder({
             Max nodes
             <input
               type="number"
-              min={5}
-              max={30}
-              value={limits.maxTotalNodes}
+              min={1}
+              placeholder="No limit"
+              value={limits.maxTotalNodes ?? ""}
               onChange={(e) =>
                 onLimitsChange({
                   ...limits,
-                  maxTotalNodes: Number(e.target.value),
+                  maxTotalNodes: parseOptionalLimit(e.target.value),
                 })
               }
             />

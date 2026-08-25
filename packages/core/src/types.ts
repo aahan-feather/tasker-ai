@@ -152,16 +152,14 @@ export interface CustomScenarioDefinition {
 }
 
 export interface GraphSimulationLimits {
-  maxDepth: number;
-  maxBranchesPerNode: number;
-  maxTotalNodes: number;
+  /** Omit or 0 = no limit */
+  maxDepth?: number;
+  maxBranchesPerNode?: number;
+  maxTotalNodes?: number;
 }
 
-export const DEFAULT_GRAPH_LIMITS: GraphSimulationLimits = {
-  maxDepth: 4,
-  maxBranchesPerNode: 3,
-  maxTotalNodes: 15,
-};
+/** Empty = run until scenario branches are fully explored (within practical bounds). */
+export const DEFAULT_GRAPH_LIMITS: GraphSimulationLimits = {};
 
 export interface GraphSimulationRequest {
   scenario: CustomScenarioDefinition;

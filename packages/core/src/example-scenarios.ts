@@ -151,6 +151,5 @@ export function buildPriorAuthGraphRequest(): GraphSimulationRequest {
   return {
     scenario: PRIOR_AUTH_SCENARIO,
     policies: DEFAULT_POLICIES,
-    limits: { maxDepth: 4, maxBranchesPerNode: 3, maxTotalNodes: 15 },
   };
 }

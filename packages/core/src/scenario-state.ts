@@ -47,32 +47,61 @@ export function deriveMemoryFromReturn(
   return `${toolName} returned: ${returnValue}`;
 }
 
+export function isTerminalSuccessReturn(
+  returnValue: string,
+  outcome: string,
+): boolean {
+  const r = returnValue.toLowerCase();
+  const o = outcome.toLowerCase();
+
+  const explicitTerminal = [
+    "goal achieved",
+    "goal complete",
+    "outcome achieved",
+    "all documents validated successfully",
+    "all required documents received",
+  ];
+  if (explicitTerminal.some((phrase) => r.includes(phrase))) {
+    return true;
+  }
+
+  if (o.includes("appointment") && r.includes("appointment booked")) {
+    return true;
+  }
+  if (o.includes("scheduled") && (r.includes("booked") || r.includes("scheduled"))) {
+    return true;
+  }
+  if (o.includes("authorization") && r.includes("authorization approved")) {
+    return true;
+  }
+  if (o.includes("document") && r.includes("all documents")) {
+    return true;
+  }
+
+  return false;
+}
+
 export function applyToolReturn(
   state: ScenarioState,
   toolName: string,
   category: string,
   returnValue: string,
+  scenarioOutcome: string,
 ): ScenarioState {
   const next = cloneScenarioState(state);
   next.stepIndex += 1;
 
-  const lower = returnValue.toLowerCase();
   if (category === "phone") {
     next.phoneCallsToday += 1;
     next.phoneCallsWeek += 1;
   }
 
-  if (
-    lower.includes("complete") ||
-    lower.includes("success") ||
-    lower.includes("booked") ||
-    lower.includes("confirmed") ||
-    lower.includes("received")
-  ) {
+  if (isTerminalSuccessReturn(returnValue, scenarioOutcome)) {
     next.completed = true;
     next.context.status = "success";
   }
 
+  const lower = returnValue.toLowerCase();
   if (lower.includes("blocked") || lower.includes("denied") || lower.includes("timeout")) {
     next.context.lastIssue = returnValue;
   }
@@ -82,7 +111,7 @@ export function applyToolReturn(
   }
 
   if (next.stepIndex % 2 === 0) {
-    next.day = Math.min(next.day + 1, 7);
+    next.day = Math.min(next.day + 1, 30);
     next.phoneCallsToday = 0;
   }
 
