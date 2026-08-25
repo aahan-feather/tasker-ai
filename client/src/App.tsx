@@ -10,6 +10,7 @@ import {
 } from "./api";
 import { GraphOverview } from "./components/GraphOverview";
 import { HorizonTimeline } from "./components/HorizonTimeline";
+import { PolicyPanel } from "./components/PolicyPanel";
 import { ScenarioBuilder } from "./components/ScenarioBuilder";
 import type {
   CustomScenarioDefinition,
@@ -57,6 +58,7 @@ export default function App() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [task, setTask] = useState<TaskDefinition | null>(null);
   const [policies, setPolicies] = useState<PolicyDefinition[]>([]);
+  const [enabledPolicyIds, setEnabledPolicyIds] = useState<Set<string>>(new Set());
   const [personaId, setPersonaId] = useState<PersonaId>("responsive");
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [graph, setGraph] = useState<SimulationGraph | null>(null);
@@ -67,12 +69,16 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   const loadTemplate = useCallback((template: TaskTemplate) => {
+    const nextPolicies = clonePolicies(template.policies);
     setTask(cloneTask(template.task));
-    setPolicies(clonePolicies(template.policies));
+    setPolicies(nextPolicies);
+    setEnabledPolicyIds(new Set(nextPolicies.map((p) => p.id)));
     setPersonaId(template.defaultPersonaId);
     setResult(null);
     setError(null);
   }, []);
+
+  const activePolicies = policies.filter((p) => enabledPolicyIds.has(p.id));
 
   useEffect(() => {
     fetchTemplates()
@@ -107,7 +113,7 @@ export default function App() {
     setError(null);
     setGraph(null);
     try {
-      const sim = await runSimulation(task, policies, personaId);
+      const sim = await runSimulation(task, activePolicies, personaId);
       setResult(sim);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Run failed");
@@ -127,7 +133,7 @@ export default function App() {
     try {
       const g = await runGraphSimulation({
         scenario,
-        policies,
+        policies: activePolicies,
         limits,
       });
       setGraph(g);
@@ -137,6 +143,15 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const togglePolicy = (policyId: string) => {
+    setEnabledPolicyIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(policyId)) next.delete(policyId);
+      else next.add(policyId);
+      return next;
+    });
   };
 
   const updatePolicyMax = (policyId: string, max: number) => {
@@ -215,32 +230,15 @@ export default function App() {
           <aside className={styles.panel}>
             <h2>Policies</h2>
             <p className={styles.panelHint}>
-              Shared with templates — caps apply to phone/SMS/email tools.
+              Toggle guardrails for this run. Goal gates stop outreach when the goal
+              is complete; caps apply to phone/SMS/email tools.
             </p>
-            <ul className={styles.policyList}>
-              {policies.map((policy) => (
-                <li key={policy.id} className={styles.policyItem}>
-                  <div className={styles.policyHeader}>
-                    <code>{policy.id}</code>
-                    <span className={styles.policyType}>{policy.type}</span>
-                  </div>
-                  {policy.type === "frequency_cap" && (
-                    <label className={styles.inlineField}>
-                      Max {policy.channel}
-                      <input
-                        type="number"
-                        min={0}
-                        max={20}
-                        value={policy.max ?? 0}
-                        onChange={(e) =>
-                          updatePolicyMax(policy.id, Number(e.target.value))
-                        }
-                      />
-                    </label>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <PolicyPanel
+              policies={policies}
+              enabledIds={enabledPolicyIds}
+              onToggle={togglePolicy}
+              onMaxChange={updatePolicyMax}
+            />
           </aside>
 
           <main className={styles.horizonPanel}>
